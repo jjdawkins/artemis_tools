@@ -17,32 +17,41 @@ from nav_msgs.msg import Odometry
 class stateSender:
     def __init__(self):
 
-        self.udp_ip = rospy.get_param('swat/udp_ip', '192.168.4.1')
-        self.udp_port = rospy.get_param('swat/udp_port',9090)
-        self.send_dt = rospy.get_param('swat/send_period',0.04)
-        self.adverise_dt = rospy.get_param('swat/adverise_period',10)
-        self.name = 'traxxis_x01'
-        self.mocap_sub = rospy.Subscriber('/qualisys/'+self.name+'/odom', Odometry,self.odomCallBack)
+        self.udp_ip = rospy.get_param('udp_ip', '192.168.4.1')
+        self.udp_port = rospy.get_param('udp_port',9090)
+        self.send_dt = rospy.get_param('send_period',0.04)
+        self.adverise_dt = rospy.get_param('adverise_period',10)
+        self.names = rospy.get_param('rigid_bodies/names')
+        #self.mocap_sub = rospy.Subscriber('/qualisys/'+self.name+'/odom', Odometry,self.odomCallBack)
         #self.pose_sub = rospy.Subscriber('/qualisys/Truck1/pose', PoseStamped,self.poseCallBack)
         self.advertise_timer = rospy.Timer(rospy.Duration(self.adverise_dt),self.advertiseCallBack)
         #self.send_timer = rospy.Timer(rospy.Duration(self.send_dt), self.sendCallBack)
+        #rospy.loginfo(len(self.names))
+        self.sub_list = []
+        self.names_n = len(self.names)
+
+        for current_name in self.names:
+            sub = rospy.Subscriber('/qualisys/'+current_name+'/odom', Odometry,self.odomCallBack, current_name)
+            self.sub_list.append(sub)
+            #self.mocap_sub = rospy.Subscriber('/qualisys/'+self.name+'/odom', Odometry,self.odomCallBack)
 
         self.sock = socket.socket(socket.AF_INET, # Internet
                                  socket.SOCK_DGRAM) # UDP
         self.sock.setsockopt(socket.SOL_SOCKET,socket.SO_BROADCAST,1)
         self.sock.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)
+
         self.odom_msg = Odometry()
         self.pose_msg = PoseStamped()
-#Start every message with MEssage followed my a unique identifier, latitude, longitude, and altitude
 
-    def odomCallBack(self,msg):
-        #h = std_msgs.msg.Header()
-        #h.stamp = rospy.Time.now()
+    def odomCallBack(self,msg,name):
+        #h = std_msgs.msg.Headr()
+        #h.stamp = rospy.Time.ow()
         #self.geo_pose.header = h
         #self.odom_msg.child_frame_id = self.id
         self.odom_msg = msg
         msg_dict = message_converter.convert_ros_message_to_dictionary(self.odom_msg)
-        json_msg = json.dumps({'op':'publish', 'topic': self.name+'/odom','msg':msg_dict})
+        json_msg = json.dumps({'op':'publish', 'topic': name+'/odom','msg':msg_dict})
+        rospy.loginfo(json_msg)
         self.sock.sendto(json_msg.encode(),(self.udp_ip,self.udp_port))
 
     def poseCallBack(self,msg):
@@ -59,22 +68,16 @@ class stateSender:
 
     def advertiseCallBack(self,msg):
 
-        adv_msg = json.dumps({ "op": "advertise",
-                                "id": self.name,
-                                "topic": self.name+"/odom",
-                                "type": "nav_msgs/Odometry"
-                                })
+        for name in self.names:
+            adv_msg = json.dumps({ "op": "advertise",
+                                    "id": name,
+                                    "topic": name +"/odom",
+                                    "type": "nav_msgs/Odometry"
+                                    })
 
-        self.sock.sendto(adv_msg.encode(),(self.udp_ip,self.udp_port))
+            self.sock.sendto(adv_msg.encode(),(self.udp_ip,self.udp_port))
+            rospy.sleep(0.01)
 
-        adv_msg2 = json.dumps({ "op": "advertise",
-                                "id": "Truck1",
-                                "topic": "/mocap/pose",
-                                "type": "geometry_msgs/PoseStamped"
-                                })
-
-
-        self.sock.sendto(adv_msg2.encode(),(self.udp_ip,self.udp_port))
 
 
     def sendCallBack(self,msg):
