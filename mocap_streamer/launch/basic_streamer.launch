@@ -1,0 +1,4 @@
+<launch>
+<rosparam command="load" file="$(find mocap_streamer)/config/traxxis.yaml"/>
+
+</launch>

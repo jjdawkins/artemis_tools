@@ -1,6 +1,6 @@
-udp_ip: 192.168.8.255
+udp_ip: 192.168.4.255
 udp_port: 9090
 send_period: 0.04
 adverise_period: 10
 rigid_bodies:
-   names: ['traxxis_x01','Truck1']
+   names: ['traxxis_x01']
