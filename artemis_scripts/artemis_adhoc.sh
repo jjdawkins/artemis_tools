@@ -1,6 +1,6 @@
 #!/bin/sh
 sudo ip link set down dev $1
-sudo ip link set mtu 1532 dev $1
+sudo ip link set mtu 1500 dev $1
 sudo iwconfig $1 mode ad-hoc
 sudo iwconfig $1 essid arty-net
 sudo iwconfig $1 ap 02:12:34:56:78:9A
