@@ -1,4 +1,4 @@
 <launch>
-<rosparam command="load" file="$(find mocap_streamer)/config/traxxis.yaml"/>
-
+<rosparam command="load" file="$(find mocap_streamer)/config/ew486f.yaml"/>
+<node pkg="mocap_streamer" name="Mocap_Streamer" type="dynamic_mocap_streamer.py" output="screen"/>
 </launch>

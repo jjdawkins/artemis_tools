@@ -24,15 +24,15 @@ class mocapSender:
         self.names = rospy.get_param('rigid_bodies/names')
         self.names_n = len(self.names)
         self.sub_list = []
-        self.odom_list = []
+        self.pose_list = []
         self.adv_indx = 0
         self.send_indx = 0
 
         for current_name in self.names:
-            sub = rospy.Subscriber('/qualisys/'+current_name+'/odom', Odometry,self.odomCallBack, current_name)
+            sub = rospy.Subscriber('/qualisys/'+current_name+'/pose', PoseStamped ,self.poseCallBack, current_name)
             self.sub_list.append(sub)
-            tmp_odom = Odometry()
-            self.odom_list.append(tmp_odom)
+            tmp_pose = PoseStamped()
+            self.pose_list.append(tmp_pose)
 
         self.sock = socket.socket(socket.AF_INET, # Internet
                                  socket.SOCK_DGRAM) # UDP
@@ -46,14 +46,12 @@ class mocapSender:
         self.odom_msg = Odometry()
         self.pose_msg = PoseStamped()
 
-    def odomCallBack(self,msg,name):
+    def poseCallBack(self,msg,name):
         ind = self.names.index(name)
-        self.odom_list[ind] = msg
-
-    def poseCallBack(self,msg):
-        self.pose_msg.pose = msg.pose
-        msg_dict = message_converter.convert_ros_message_to_dictionary(self.pose_msg)
-        json_msg = json.dumps({'op':'publish', 'topic': '/mocap/pose','msg':msg_dict})
+        self.pose_list[ind] = msg
+        #self.pose_msg.pose = msg.pose
+        #msg_dict = message_converter.convert_ros_message_to_dictionary(self.pose_msg)
+        #json_msg = json.dumps({'op':'publish', 'topic': '/mocap/pose','msg':msg_dict})
         #self.sock.sendto(json_msg.encode(),(self.udp_ip,self.udp_port))
 
     def advertiseCallBack(self,msg):
@@ -61,8 +59,8 @@ class mocapSender:
         current_name = self.names[self.adv_indx]
         adv_msg = json.dumps({ "op": "advertise",
                                 "id": current_name,
-                                "topic": current_name +"/odom",
-                                "type": "nav_msgs/Odometry"
+                                "topic": current_name +"/pose",
+                                "type": "geometry_msgs/PoseStamped"
                                 })
         try:
             self.sock.sendto(adv_msg.encode(),(self.udp_ip,self.udp_port))
@@ -91,8 +89,8 @@ class mocapSender:
 
         current_name = self.names[self.send_indx]
 
-        msg_dict = message_converter.convert_ros_message_to_dictionary(self.odom_list[self.send_indx])
-        json_msg = json.dumps({'op':'publish', 'topic':current_name+"/odom",'msg':msg_dict})
+        msg_dict = message_converter.convert_ros_message_to_dictionary(self.pose_list[self.send_indx])
+        json_msg = json.dumps({'op':'publish', 'topic':current_name+"/pose",'msg':msg_dict})
         try:
             self.sock.sendto(json_msg.encode(),(self.udp_ip,self.udp_port))
         except socket.error as socketerror:
@@ -115,7 +113,7 @@ class mocapSender:
 
 
 if __name__ == '__main__':
-    rospy.init_node('mocap_Sender')
+    rospy.init_node('mocap_pose_sender')
 
     mySender = mocapSender()
 
