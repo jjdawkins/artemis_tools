@@ -1,4 +1,4 @@
-udp_ip: 192.168.8.255
+udp_ip: 192.168.10.255
 udp_port: 9091
 send_period: 0.1
 adverise_period: 10

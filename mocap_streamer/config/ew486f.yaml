@@ -1,6 +1,0 @@
-udp_ip: 192.168.8.255
-udp_port: 9090
-send_period: 0.1
-adverise_period: 10
-rigid_bodies:
-   names: ['rover','WidowsWail','DaBaby','LilNos']

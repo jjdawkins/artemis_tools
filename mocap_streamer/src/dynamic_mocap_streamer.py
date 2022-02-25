@@ -36,7 +36,7 @@ class mocapSender:
 
         self.sock = socket.socket(socket.AF_INET, # Internet
                                  socket.SOCK_DGRAM) # UDP
-        self.sock.setsockopt(socket.SOL_SOCKET,socket.SO_BROADCAST,1)
+        #self.sock.setsockopt(socket.SOL_SOCKET,socket.SO_BROADCAST,1)
         self.sock.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)
 
         self.advertise_timer = rospy.Timer(rospy.Duration(self.adverise_dt/self.names_n),self.advertiseCallBack)
@@ -57,7 +57,7 @@ class mocapSender:
         #self.sock.sendto(json_msg.encode(),(self.udp_ip,self.udp_port))
 
     def advertiseCallBack(self,msg):
-        status_msg = "Current List of Objects : "
+        status_msg = "Advertising for Object : "
         current_name = self.names[self.adv_indx]
         adv_msg = json.dumps({ "op": "advertise",
                                 "id": current_name,
@@ -84,10 +84,10 @@ class mocapSender:
         else:
             self.adv_indx = self.adv_indx + 1
 
-        rospy.loginfo(status_msg)
+        rospy.loginfo(status_msg + current_name)
 
     def sendCallBack(self,msg):
-        rospy.loginfo(rospy.get_time()-self.init_time)
+        #rospy.loginfo(rospy.get_time()-self.init_time)
 
         current_name = self.names[self.send_indx]
 

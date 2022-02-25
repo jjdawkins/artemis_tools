@@ -1,0 +1,4 @@
+send_period: 0.04
+adverise_period: 10
+rigid_bodies:
+   names: ['rover_1','rover_2','rover_3']

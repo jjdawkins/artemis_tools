@@ -48,6 +48,7 @@ class mocapSender:
 
     def poseCallBack(self,msg,name):
         ind = self.names.index(name)
+        msg.header.frame_id = 'odom'
         self.pose_list[ind] = msg
         #self.pose_msg.pose = msg.pose
         #msg_dict = message_converter.convert_ros_message_to_dictionary(self.pose_msg)
@@ -59,7 +60,8 @@ class mocapSender:
         current_name = self.names[self.adv_indx]
         adv_msg = json.dumps({ "op": "advertise",
                                 "id": current_name,
-                                "topic": current_name +"/pose",
+                                # topic": current_name +"/pose",
+                                "topic": "/mavros/vision_pose/pose",
                                 "type": "geometry_msgs/PoseStamped"
                                 })
         try:
@@ -90,7 +92,8 @@ class mocapSender:
         current_name = self.names[self.send_indx]
 
         msg_dict = message_converter.convert_ros_message_to_dictionary(self.pose_list[self.send_indx])
-        json_msg = json.dumps({'op':'publish', 'topic':current_name+"/pose",'msg':msg_dict})
+        #json_msg = json.dumps({'op':'publish', 'topic':current_name+"/pose",'msg':msg_dict})
+        json_msg = json.dumps({'op':'publish', 'topic':'/mavros/vision_pose/pose','msg':msg_dict})        
         try:
             self.sock.sendto(json_msg.encode(),(self.udp_ip,self.udp_port))
         except socket.error as socketerror:

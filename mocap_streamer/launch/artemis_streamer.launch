@@ -1,4 +1,4 @@
 <launch>
-<rosparam command="load" file="$(find mocap_streamer)/config/drone.yaml"/>
+<rosparam command="load" file="$(find mocap_streamer)/config/rover_demo.yaml"/>
 <node pkg="mocap_streamer" name="Mocap_Streamer" type="dynamic_mocap_streamer.py" output="screen"/>
 </launch>

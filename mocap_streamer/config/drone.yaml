@@ -1,0 +1,6 @@
+udp_ip: 192.168.10.22
+udp_port: 9090
+send_period: 0.08
+adverise_period: 10
+rigid_bodies:
+   names: ['flame_1']
