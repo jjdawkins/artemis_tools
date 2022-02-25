@@ -6,7 +6,6 @@ import numpy as np
 import socket
 import json
 import tf
-from rospy_message_converter import json_message_converter,  message_converter
 
 from std_msgs.msg import Empty, String, Header
 from sensor_msgs.msg import NavSatFix, Imu
