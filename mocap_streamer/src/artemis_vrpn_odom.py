@@ -37,7 +37,7 @@ class odomSender:
         for current_name in self.names:
             sub = rospy.Subscriber('/vrpn_client_node/'+current_name+'/pose', PoseStamped ,self.poseCallBack, current_name)
             self.sub_list.append(sub)
-            pub = rospy.Publisher('/'+current_name+'/odom',Odometry,queue_size=10)
+            pub = rospy.Publisher('/'+current_name+'/mocap/odom',Odometry,queue_size=10)
             self.pub_list.append(pub)
             tmp_pose = PoseStamped()
             self.pose_list.append(tmp_pose)
